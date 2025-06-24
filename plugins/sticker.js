@@ -21,7 +21,11 @@ bot(
 
     const mediaPath = await message.reply_message.downloadAndSaveMediaMessage('sticker')
     const type = message.reply_message.image ? 1 : 2
-    const stickerData = await sticker('str', mediaPath, type, message.id)
+
+    let stickerData = await sticker('str', mediaPath, type, message.id)
+
+    // ✅ Add watermark to the sticker
+    stickerData = await addExif(stickerData, 'MOK DREKANS|🇭🇹 WhatsApp Bot', message.id)
 
     return await message.send(
       stickerData,
@@ -43,7 +47,10 @@ bot(
     }
 
     const mediaPath = await message.reply_message.downloadAndSaveMediaMessage('circleSticker')
-    const circleData = await circleSticker(mediaPath, message.reply_message.video, message.id)
+    let circleData = await circleSticker(mediaPath, message.reply_message.video, message.id)
+
+    // ✅ Add watermark to the circular sticker
+    circleData = await addExif(circleData, 'MOK DREKANS|🇭🇹 WhatsApp Bot', message.id)
 
     return await message.send(circleData, { isAnimated: false, quoted: message.quoted }, 'sticker')
   }
@@ -65,8 +72,12 @@ bot(
 
     if (message.reply_message.sticker) {
       const media = await message.reply_message.downloadMediaMessage('mp4')
+
+      // If no custom name is given, use default watermark
+      const pack = match || 'MOK DREKANS|🇭🇹 WhatsApp Bot'
+
       return await message.send(
-        await addExif(media, match, message.id),
+        await addExif(media, pack, message.id),
         { quoted: message.quoted },
         'sticker'
       )
